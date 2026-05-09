@@ -9,6 +9,10 @@ from lora import LoRALayer, make_hook
 
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+
+for param in model.parameters():
+    param.requires_grad = False
+
 tokenizer.pad_token = tokenizer.eos_token
 
 d, k, r, alpha = 768, 768, 4, 4

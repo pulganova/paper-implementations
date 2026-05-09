@@ -11,13 +11,14 @@ class LoRALayer(nn.Module):
 
     def forward(self, x):
         x_shape = x.shape
-        x = x.view(-1,768)
+        x = x.view(-1,x.shape[-1])
         x = (self.alpha/self.r) * x @ self.A.T @ self.B.T
         return x.view(x_shape)
 
 def make_hook(i, LoRAs):
     def hook_fn(module, input, output):
-        output[:,:,:768] = output[:,:,:768] + LoRAs[i][0](input[0])
-        output[:,:,1536:] = output[:,:,1536:] + LoRAs[i][1](input[0])
+        embed_dim = output.shape[-1] // 3
+        output[:,:,:embed_dim] = output[:,:,:embed_dim] + LoRAs[i][0](input[0])
+        output[:,:,embed_dim*2:] = output[:,:,embed_dim*2:] + LoRAs[i][1](input[0])
         return output
     return hook_fn
